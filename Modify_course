@@ -1,0 +1,194 @@
+
+#!/bin/bash
+
+clear
+
+file="course.txt"
+
+tryAgain=y
+while [[ "$tryAgain" = [Yy] ]]
+do
+	foundCourse=0
+	if [ -f course.txt ]
+	then
+		echo ""
+		echo " Modify Course Details "
+		echo " ======================= "
+		echo ""
+		echo -n " Enter Course Code: "; read searchCode
+		
+		while IFS=":" read -r cCode cName cHour
+		do
+			if [ "$cCode" = "$searchCode" ]
+			then   
+				echo ""
+				echo ""
+				echo " ======================= "
+				echo "     Course Details"
+				echo " ======================= "
+				echo " Course Name   : $cName"
+				echo " Credit Hours  : $cHour"
+				echo " ======================= "
+				oldcCode=$cCode
+				oldcName=$cName
+				oldcHour=$cHour
+				foundCourse=1
+			fi
+		done < "$file"
+		
+		if [ "$foundCourse" = 1 ]
+		then
+			answer=Y
+			while [[ "$answer" = [Yy] ]]
+	      		do
+	      			echo ""
+	      			echo ""
+	      			echo " ====================== "
+	      			echo "       Modify Menu"
+	      			echo " ====================== "
+				echo " 1 -- Course Name"
+				echo " 2 -- Credit Hours"
+				echo ""
+				echo " *Press (s) if you don't wish to modify the data."
+				echo ""
+				echo -n " Select for modify: "; read selectNum
+				
+				while [[ ! "$selectNum" = [12] && ! "$selectNum" = [Ss] ]]
+				do
+					echo " Invalid input. Please enter again."
+					echo ""
+					echo -n " Select for modify: "; read selectNum
+				done
+				
+				if [[ "$selectNum" = [Ss] ]]
+				then
+					break
+				fi
+				
+				case "$selectNum" in	
+				1)
+					NameError=1
+		    			echo ""
+		    			echo " Current Course Name: $oldcName"
+		    			while [ "$NameError" = 1 ]
+		    			do
+		    				NameError=0
+		    				echo -n " Enter New Course Name: "; read newcName
+		    				##check whether it contain number
+		    				if [[ "$newcName" =~ [0-9] ]]
+		    				then
+		    					NameError=1
+		    					echo " The course name cannot contain number(s). Please enter again."
+		    					echo ""
+		    				##check whether the input is null
+		    				elif [ -z "$newcName" ]
+		    				then
+		    					NameError=1
+		    					echo " This section cannot be empty. Please enter again."
+		    					echo ""
+		    				##check exist course name
+		    				elif [ -f course.txt ]
+		    				then
+		    					while IFS=":" read -r codecourse cname crehour
+		    					do
+		    						if [ "$newcName" = "$cname" ]
+		    						then
+		    							NameError=1
+		    							echo " The course name already exist. Please enter again."
+		    							echo ""
+		    						fi
+		    					done < "$file"
+		    				fi
+		    			done
+            				
+		    			sed -i "s/$oldcCode":"$oldcName/$oldcCode":"$newcName/gi" course.txt
+		    			echo ""
+		    			echo " The course name has been updated."
+		    			oldcName=$newcName
+		    			;;
+				2)
+					HourError=1
+		    			echo ""
+		    			echo " Current Credit Hours: $oldcHour"
+		    			while [ "$HourError" = 1 ]
+		    			do
+		    				HourError=0
+		    				echo -n " Enter New Credit Hours: "; read newcHour	
+		    				##check if the input is all integer
+		    				if [[ "$newcHour" =~ ^[+-]?[0-9]+$ ]]
+		    				then
+		    					##check the input is between 1 and 12
+		    					if [ "$newcHour" -lt 1 -o "$newcHour" -gt 12 ]
+		    					then
+		    						HourError=1
+		    					fi
+		    				else
+		    					HourError=1
+		    				fi
+		    				
+		    				if [ "$HourError" = 1 ]
+		    				then
+		    					echo " Invalid input. Please enter again."
+		    					echo ""
+		    				fi
+		    			done
+            			
+		    			sed -i "s/$oldcName":"$oldcHour/$oldcName":"$newcHour/gi" course.txt
+		    			echo ""
+		    			echo " The credit hours has been updated."
+		    			oldcHour=$newcHour
+		    			;;
+				esac
+				
+				echo ""
+				echo ""
+				echo " *Press (q) if nothing to change for this course."
+				echo ""
+				echo -n " Continue Modified This Course? (y)es or (q)uit: "; read answer
+				
+				while [[ ! "$answer" = [YyQq] ]]
+				do
+					echo " Invalid input. Please try again."
+					echo ""
+					echo -n " Continue Modified This Course? (y)es or (q)uit: "; read answer
+				done		
+			done
+		elif [ "$foundCourse" = 0 ]
+		then
+			echo " The course code does not exist. Please enter again."
+		fi
+	else
+		echo ""
+		echo " There is no course detail in the database."
+		sleep 2
+		clear
+		source /home/jaysim/mainMenu
+	fi
+	
+	echo ""
+	echo " *Press (q) to return to College Management Menu"
+	echo ""
+	echo -n " Modify Another Course? (y)es or (q)uit: "; read tryAgain
+				
+	while [[ ! "$tryAgain" = [YyQq] ]]
+	do
+		echo " Invalid input. Please try again."
+		echo ""
+		echo -n " Modify Another Course? (y)es or (q)uit: "; read tryAgain
+	done
+	
+	if [[ "$tryAgain" = [Qq] ]]
+	then
+		clear
+		source /home/jaysim/mainMenu
+	fi
+done
+   
+
+
+
+
+
+
+
+

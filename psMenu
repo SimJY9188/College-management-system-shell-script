@@ -1,0 +1,225 @@
+
+#!/bin/bash
+
+clear
+
+addStud=Y
+_input4="student.txt"
+
+while [[ "$addStud" = [Yy] ]]
+do
+   echo ""
+   echo "           Programme Selections Menu"
+   echo "           ========================="
+   echo ""
+   echo "T -- RIT (Bachelor in Information Technology)"
+   echo "D -- RSD (Bachelor in Software Development)"
+   echo "S -- RST (Bachelor in Interactive Software Technology)"
+   echo "E -- REI (Bachelor in Enterprise Information System)"
+   echo "F -- RSF (Bachelor in Software Engineering)"
+   echo ""
+   echo "Q -- Quit (Return to College Management Menu)"
+   echo ""
+   echo -n "Please select a choice: "; read choice2
+ 
+   while [[ ! "$choice2" = [TDSEFQtdsefq] ]]
+   do
+      echo "Invalid input. Please try again."
+      echo ""
+      echo -n "Please select a choice: "; read choice2
+   done
+
+   case "$choice2" in
+   [Tt])
+      course=RIT;;
+   [Dd])
+      course=RSD;;
+   [Ss])
+      course=RST;;
+   [Ee])
+      course=REI;;
+   [Ff])
+      course=RSF;;
+   [Qq])
+      clear
+      source /home/jaysim/mainMenu
+   esac
+
+   echo ""
+   echo ""
+   echo "             Add New Student Form"
+   echo "             ===================="
+   echo ""
+   
+   idError=1
+   while [ "$idError" = 1 ]
+   do
+      idError=0
+      echo -n "Student ID              : "; read studID
+      ##check student ID format & whether the input is null
+      if [[ ! "$studID" = [0-9][0-9][A-Z][A-Z][A-Z][0-9][0-9][0-9][0-9][0-9] ]]
+      then
+         idError=1
+         echo "The student ID format is incorrect. Please enter again."
+         echo ""
+      ##check exist student ID
+      elif [ -f student.txt ]
+      then
+         while IFS=":" read -r code id name bdate pnum hadd eadd
+         do
+            if [ "$studID" = "$id" ]
+            then
+               idError=1
+               echo "The student ID already exist. Please enter again."
+               echo ""
+            fi
+         done < "$_input4"
+      fi
+   done
+   
+   studNameError=1
+   while [ "$studNameError" = 1 ]
+   do
+      studNameError=0
+      echo -n "Student Name            : "; read studName
+      ##check whether the input is null
+      if [ -z "$studName" ]
+      then
+         studNameError=1
+         echo "This section cannot be empty. Please enter again."
+         echo ""
+      ##check whether it contain number
+      elif [[ "$studName" =~ [0-9] ]]
+      then
+         studNameError=1
+         echo "The student name cannot contain number(s). Please enter again."
+         echo ""
+      fi
+   done
+
+   currentDate=$(date +"%Y-%m-%d")
+   birthDateError=1
+   while [ "$birthDateError" = 1 ]
+   do
+      birthDateError=0
+      echo -n "Birth Date (DD-MM-YYYY) : "; read birthDate
+      IFS="-" ; read day month year <<< "$birthDate"
+      ##check date format
+      if [[ "$year" -le 1000 || "$year" -ge 9999 ]]
+      then
+         birthDateError=1
+         echo "The year format is incorrect. Please enter again."
+         echo ""
+      elif [[ ! "$month" =~ [0-9]{2} ]]
+      then
+         birthDateError=1
+         echo "The month format is incorrect. Please enter again."
+         echo ""
+      elif [[ ! "$day" =~ [0-9]{2} ]]   
+      then
+         birthDateError=1
+         echo "The day format is incorrect. Please enter again."
+         echo ""
+      else
+         newDateFormat=$year"-"$month"-"$day
+         date "+%Y-%m-%d" -d "$newDateFormat" > /dev/null 2>&1
+         if [ $? != 0 ]
+         then
+            birthDateError=1
+            echo "The date does not exist. Please enter again."
+            echo ""
+         elif expr "$newDateFormat" ">" "$currentDate" > /dev/null
+         then
+            birthDateError=1
+            echo "The date has passed. Please enter again."
+            echo ""
+         fi
+      fi
+   done
+   
+   contNumError=1
+   while [ "$contNumError" = 1 ]
+   do
+      contNumError=0
+      echo -n "Contact Number          : "; read contactNum
+      ##check contact number format & whether the input is null
+      if [[ ! "$contactNum" = "01"[0-9]"-"[0-9][0-9][0-9][0-9][0-9][0-9][0-9] && ! "$contactNum" =~ 01[0-9]"-"[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9] ]]
+      then
+         contNumError=1
+         echo "The contact number format is incorrect. Please enter again."
+         echo ""
+      ##check exist contact number
+      elif [ -f student.txt ]
+      then
+         while IFS=":" read -r code2 id2 name2 bdate2 pnum2 hadd2 eadd2
+         do
+            if [ "$contactNum" = "$pnum2" ]
+            then
+               contNumError=1
+               echo "The contact number already exist. Please enter again."
+               echo ""
+            fi
+         done < "$_input4"
+      fi
+   done
+   
+   addressError=1
+   while [ "$addressError" = 1 ]
+   do
+      addressError=0
+      echo -n "Mailing Address         : "; read mailAdd
+      ##check whether the input is null
+      if [ -z "$mailAdd" ]
+      then
+         addressError=1
+         echo "This section cannot be empty. Please enter again."
+         echo ""
+      fi
+   done
+   
+   emailError=1
+   while [ "$emailError" = 1 ]
+   do
+      emailError=0
+      echo -n "Email Address           : "; read emailAdd
+      #check email address format & whether the input is null
+      if [[ "$emailAdd" !=  *@?*.?* ]]
+      then
+         emailError=1
+         echo "The email address format is incorrect. Please enter again."
+         echo ""
+      ##check exist email address
+      elif [ -f student.txt ]
+      then
+         while IFS=":" read -r code3 id3 name3 bdate3 pnum3 hadd3 eadd3
+         do
+            if [ "$emailAdd" = "$eadd3" ]
+            then
+               emailError=1
+               echo "The email address already exist. Please enter again."
+               echo ""
+            fi
+         done < "$_input4"
+      fi
+   done
+   
+   echo "$course:$studID:$studName:$birthDate:$contactNum:$mailAdd:$emailAdd" >> student.txt
+
+   echo ""
+   echo "Press (q) to return to College Management Menu"
+   echo ""
+   echo -n "Add Another Student? (y)es or (q)uit: "; read addStud
+   
+   while [[ ! "$addStud" = [YyQq] ]]
+   do
+      echo "Invalid input. Please enter again."
+      echo ""
+      echo -n "Add Another Student? (y)es or (q)uit: "; read addStud
+   done
+
+   if [[ "$addStud" = [Qq] ]]
+   then
+      clear
+      source /home/jaysim/mainMenu
+   fi
+done

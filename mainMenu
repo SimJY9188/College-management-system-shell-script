@@ -1,0 +1,51 @@
+
+#!/bin/bash
+
+echo ""
+echo ""
+echo "College Management Menu"
+echo "======================="
+echo "1 -- Add New Students"  
+echo "2 -- Add New Courses"
+echo "3 -- Grade Students"  
+echo "4 -- Search Student Details"
+echo "5 -- Search Course Details"
+echo "6 -- Modify Student Details"
+echo "7 -- Modify Course Details"
+echo "8 -- Delete Student Details"
+echo "9 -- Delete Course Details"
+echo ""
+echo "Q -- Quit (exit from program)"
+echo ""
+
+echo -n "Please select a choice: "; read choice
+
+while [[ ! "$choice" = [123456789Qq] ]]
+do
+   echo "Invalid input. Please enter again."
+   echo ""
+   echo -n "Please select a choice: "; read choice
+done
+
+case "$choice" in 
+1)
+   source /home/jaysim/psMenu;;
+2)
+   source /home/jaysim/add_Course;;
+3)
+   source /home/jaysim/studentValidation;;
+4) 
+   source /home/jaysim/search_Stud;;
+5)
+   source /home/jaysim/search_Course;;
+6)
+   source /home/jaysim/Modify_stud;;
+7)
+   source /home/jaysim/Modify_course;;
+8)
+   source /home/jaysim/del_Stud;;
+9)
+   source /home/jaysim/del_Course;;
+Q|q)
+   exit;;
+esac

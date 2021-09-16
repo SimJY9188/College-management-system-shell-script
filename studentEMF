@@ -1,0 +1,193 @@
+#!/bin/bash
+_input="course.txt"
+COLUMNS=$(tput cols)
+title="Student Examination Marks Form"
+underline="========================================="
+isError=1
+foundCode=0
+ans="y"
+typeset -i currentYear=$(date +%Y)
+
+	printf "\n%*s\n" $(((${#title}+$COLUMNS)/2)) "$title"
+	printf "%*s\n" $(((${#underline}+$COLUMNS)/2)) "$underline"
+	
+	while [[ $year -le 2000 || $year -gt $currentYear ]]
+	do
+		echo -n "Academic Year (YYYY): "; read year
+		
+		if [[ $year -le 2000 || $year -gt $currentYear ]]
+		then
+			echo "Invalid year. Please retry."
+			echo " "
+		fi
+		
+	done
+	
+	while [[ $sem != [123] ]]
+	do
+		echo -n "Semester(1/2/3) : "; read sem
+		if [[ $sem != [123] ]]
+		then
+			echo "Invalid semester. Please retry."
+			echo " "
+		fi
+	done
+
+echo "Student ID        : $1">>$1Result.txt
+echo "">>$1Result.txt
+echo "Student Name      : $2">>$1Result.txt
+echo "">>$1Result.txt
+echo "Academic Year     : $year">>$1Result.txt
+echo "">>$1Result.txt
+echo "Semester          : $sem">>$1Result.txt
+echo "">>$1Result.txt
+echo "======================================================================================">>$1Result.txt
+echo "">>$1Result.txt
+printf '%-s %20s %20s %12s %18s\n' "Course Code:" "Marks Obtained:" "Grade Obtained:" "Remark:" "Quality Point:">>$1Result.txt
+echo "">>$1Result.txt
+echo "======================================================================================">>$1Result.txt
+
+declare -a codeArray
+codeArray=()
+totalQualityP=0
+repeatedCode=0
+
+while [[ $ans = [yY] ]]
+do
+	foundCode=0
+	while [ $foundCode = 0 -o $repeatedCode = 1 ]
+	do
+	echo -n "Please enter your course code : "; read courseCode
+	if [ -z $courseCode ]
+	then
+		courseCode="not-found"
+	fi
+		while IFS=":" read -r code course credit
+		do 
+			
+			if [ "$courseCode" = "$code" ]
+			then
+				if [ ! -z $codeArray ]
+				then
+					for i in ${codeArray[@]}
+					do
+						if [ $i = $courseCode ]
+						then
+							repeatedCode=1
+							echo "Repeated Course code entered. Please retry."
+							echo ""
+						else
+							repeatedCode=0
+						fi
+					done
+				fi
+				
+		
+				
+				if [ ! -f $1$year$sem.txt ]
+				then
+					echo "$courseCode">>$1$year$sem.txt
+			
+					
+				elif [ -s $1$year$sem.txt ]
+				then
+					while IFS= read -r line
+					do
+						if [ "$courseCode" = "$line" ]
+						then
+							
+							if [ $repeatedCode != 1 ]
+							then
+								echo "You have already graded this course before. Please try another"
+								echo ""
+							fi
+							repeatedCode=1
+						
+							break;
+					
+						fi
+					done < $1$year$sem.txt
+					
+					if [ $repeatedCode != 1 ]
+					then 
+						echo "$courseCode">>$1$year$sem.txt
+					fi
+				fi
+				
+				foundCode=1
+				codeArray+=($courseCode)
+				break;
+			fi 
+		done < "$_input"
+		if [ $foundCode = 0 ]
+		then
+			echo "Invalid Course Code. Please retry."
+			echo ""
+		fi
+	done
+	
+	echo -n "Please enter the marks obtained : "; read mark
+	while [[ $mark -lt 0 || $mark -gt 100 || -z $mark || ! "$mark" =~ ^[0-9]+$ ]]
+	do	
+		
+		echo "Invalid marks. Please retry."
+		echo " "
+		echo -n "Please enter the marks obtained : "; read mark
+		echo " "
+	done
+	
+	result=$(./grade $mark)
+	IFS=, read grade gpa remark <<< $result
+	qualityP=$(expr $gpa*$credit | bc)
+	totalQualityP=$(expr $totalQualityP+$qualityP | bc )
+	
+	printf '%-20s %-20s %-17s %-15s   %-s\n' "$courseCode" "$mark" "$grade" "$remark" "$qualityP">>$1Result.txt
+	
+	echo -n "Press (y) to continue to enter student's marks or (b) to back to previous."; read ans
+	while [[ $ans != [yYbB] || -z $ans ]]
+	do
+		if [[ $ans != [yYbB] || -z $ans ]]
+		then
+			echo ""
+			echo "Invalid input. Please retry."
+		fi
+		echo -n "Press (y) to continue to enter student's marks or (b) to back to previous."; read ans
+	done
+	if [[ $ans = [bB] ]]
+	then 	
+		
+		printf '\n\n%65s  %16s\n' "Total Quality Points :" "$totalQualityP">>$1Result.txt
+		printf "\n\n">>$1Result.txt
+		echo ""
+		echo -n "Press (y) to grade another student or (q) to back to main menu."; read choice
+		while [[ $choice != [yYqQ] || -z $choice ]]
+		do
+			if [[ $choice != [yYqQ] || -z $choice ]]
+			then
+				echo "Invalid input. Please retry."
+				echo ""
+			fi
+			echo -n "Press (y) to grade another student or (q) to back to main menu."; read choice
+		done
+		
+		if [[ $choice = [yY] ]]
+		then
+			
+			source /home/jaysim/studentValidation
+		elif [[ $choice = [qQ] ]]
+		then 
+			
+			source /home/jaysim/mainMenu
+		fi
+		
+		break;
+
+	elif [[ $ans = [yY] ]]
+	then
+		echo ""
+	else 
+		echo "Invalid input. Please retry."
+	fi
+done
+
+

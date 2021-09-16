@@ -1,0 +1,237 @@
+
+#!/bin/bash
+
+clear
+
+file="student.txt"
+
+tryAgain=y
+while [[ "$tryAgain" = [Yy] ]]
+do
+	foundStud=0
+	if [ -f student.txt ]
+	then
+		echo ""
+		echo " Modify Student Details "
+		echo " ======================= "
+		echo ""
+		echo -n " Enter student ID: "; read searchID
+		
+		while IFS=":" read -r code id name bdate pnum hadd eadd
+		do
+			if [ "$id" = "$searchID" ]
+			then   
+				echo ""
+				echo ""
+				echo " ======================= "
+				echo "    Student Details"
+				echo " ======================= "
+				echo " Student Name   : $name"
+				echo " Contact Number : $pnum"
+				echo " Mailing Address: $hadd"
+				echo " Email Address  : $eadd"
+				echo " ======================= "
+				oldID=$id
+				oldName=$name
+				oldPnum=$pnum
+				oldHadd=$hadd
+				oldEadd=$eadd
+				foundStud=1
+			fi
+		done < "$file"
+		
+		if [ "$foundStud" = 1 ]
+		then
+			answer=Y
+			while [[ "$answer" = [Yy] ]]
+	      		do
+	      			echo ""
+	      			echo ""
+	      			echo " ====================== "
+	      			echo "       Modify Menu"
+	      			echo " ====================== "
+				echo " 1 -- Student Name"
+				echo " 2 -- Contact Number"
+				echo " 3 -- Mailing Address"
+				echo " 4 -- Email Address"
+				echo ""
+				echo " *Press (s) if you don't wish to modify the data."
+				echo ""
+				echo -n " Select for modify: "; read selectNum
+				
+				while [[ ! "$selectNum" = [1-4] && ! "$selectNum" = [Ss] ]]
+				do
+					echo " Invalid input. Please enter again."
+					echo ""
+					echo -n " Select for modify: "; read selectNum
+				done
+				
+				if [[ "$selectNum" = [Ss] ]]
+				then
+					break
+				fi
+				
+				case "$selectNum" in
+				1)
+		    			NameError=1
+		    			echo ""
+		    			echo " Current Student Name: $oldName"
+		    			while [ "$NameError" = 1 ]
+		    			do
+		    				NameError=0
+		    				echo -n " Enter New Student Name: "; read newName
+		    				##check whether the input is null
+		    				if [ -z "$newName" ]
+		    				then
+		    					NameError=1
+		    					echo " This section cannot be empty. Please enter again."
+		    					echo ""
+		    				##check whether it contain number
+		    				elif [[ "$newName" =~ [0-9] ]]
+		    				then
+		    					NameError=1
+		    					echo " The student name cannot contain number(s). Please enter again."
+		    					echo ""
+		    				fi
+		    			done
+            				
+		    			sed -i "s/$oldID":"$oldName/$oldID":"$newName/gi" student.txt
+		    			echo ""
+		    			echo " The student name has been updated."
+		    			oldName=$newName
+		    			;;			
+				2)
+					contactNumError=1
+		    			echo ""
+		    			echo " Current Contact Number: $oldPnum"
+					while [ "$contactNumError" = 1 ]
+					do
+						contactNumError=0
+						echo -n " Enter New Contact Number: "; read newPnum
+						##check contact number format & whether the input is null
+						if [[ ! "$newPnum" =~ "01"[0-9]"-"[0-9][0-9][0-9][0-9][0-9][0-9][0-9] && ! "$newPnum" =~ 01[0-9]"-"[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9] ]]
+						then
+							contactNumError=1
+							echo " The contact number format is incorrect. Please enter again."
+							echo ""
+						##check exist contact number
+						elif [ -f student.txt ]
+						then
+							while IFS=":" read -r code id name bdate pnum hadd eadd
+							do
+								if [ "$newPnum" = "$pnum" ]
+								then
+									contactNumError=1
+									echo " The contact number already exist. Please enter again."
+									echo ""
+								fi
+							done < "$file"
+						fi
+					done
+            			
+		    			sed -i "s/$oldPnum":"$oldHadd/$newPnum":"$oldHadd/gi" student.txt
+		    			echo ""
+		    			echo " The contact number has been updated."
+		    			oldPnum=$newPnum
+		    			;;
+				3)
+					addressError=1
+		    			echo ""
+		    			echo " Current Mailing Address: $oldHadd"
+		    			while [ "$addressError" = 1 ]
+		    			do
+		    				addressError=0
+		    				echo -n " Enter New Mailing Address: "; read newHadd
+		    				##check whether the input is null
+		    				if [ -z "$newHadd" ]
+		    				then
+		    					addressError=1
+		    					echo " This section cannot be empty. Please enter again."
+		    					echo ""
+		    				fi
+		    			done
+            			
+		    			sed -i "s/$oldPnum":"$oldHadd/$oldPnum":"$newHadd/gi" student.txt
+		    			echo ""
+		    			echo " The mailing address has been updated."
+		    			oldHadd=$newHadd
+		    			;;
+				4)
+					EmailError=1
+		    			echo ""
+		    			echo " Current Email Address: $oldEadd"
+		    			while [ "$EmailError" = 1 ]
+		    			do
+		    				EmailError=0
+		    				echo -n " Enter New Email Address: "; read newEadd
+		    				#check email address format & whether the input is null
+		    				if [[ "$newEadd" !=  *@?*.?* ]]
+		    				then
+		    					EmailError=1
+		    					echo " The email address format is incorrect. Please enter again."
+		    					echo ""
+		    				##check exist email address
+		    				elif [ -f student.txt ]
+		    				then
+		    					while IFS=":" read -r code id name bdate pnum hadd eadd
+		    					do
+		    						if [ "$newEadd" = "$eadd" ]
+		    						then
+		    							EmailError=1
+		    							echo " The email address already exist. Please enter again."
+		    							echo ""
+		    						fi
+		    					done < "$file"
+		    				fi
+		    			done
+            			
+		    			sed -i "s/$oldHadd":"$oldEadd/$oldHadd":"$newEadd/gi" student.txt
+		    			echo ""
+		    			echo " The email address has been updated."
+		    			oldEadd=$newEadd
+		    			;;
+				esac
+				
+				echo ""
+				echo ""
+				echo " *Press (q) if nothing to change for this student."
+				echo ""
+				echo -n " Continue Modified This Student? (y)es or (q)uit: "; read answer
+				
+				while [[ ! "$answer" = [YyQq] ]]
+				do
+					echo " Invalid input. Please try again."
+					echo ""
+					echo -n " Continue Modified This Student? (y)es or (q)uit: "; read answer
+				done		
+			done
+		elif [ "$foundStud" = 0 ]
+		then
+			echo " The student ID does not exist. Please enter again."
+		fi
+	else
+		echo ""
+		echo " There is no student detail in the database."
+		sleep 2
+		clear
+		source /home/jaysim/mainMenu
+	fi
+	
+	echo ""
+	echo " *Press (q) to return to College Management Menu"
+	echo ""
+	echo -n " Modify Another Student? (y)es or (q)uit: "; read tryAgain
+				
+	while [[ ! "$tryAgain" = [YyQq] ]]
+	do
+		echo " Invalid input. Please try again."
+		echo ""
+		echo -n " Modify Another Student? (y)es or (q)uit: "; read tryAgain
+	done
+	
+	if [[ "$tryAgain" = [Qq] ]]
+	then
+		clear
+		source /home/jaysim/mainMenu
+	fi
+done

@@ -1,0 +1,77 @@
+
+#!/bin/bash
+
+clear 
+
+_input5="course.txt"
+delC=Y
+
+while [[ "$delC" = [Yy] ]]
+do
+   foundCourse2=0
+   if [ -f course.txt ]
+   then
+      echo ""
+      echo "               Delete Course Details Form"
+      echo "               =========================="
+      echo ""
+      echo -n "Enter Course Code: "; read delCode
+      
+      while IFS=":" read -r codecourse4 cname4 crehour4
+      do
+         if [ "$codecourse4" = "$delCode" ]
+         then
+            foundCourse2=1
+            codeDel=$codecourse4
+            echo ""
+            echo "Course Name : $cname4"
+            echo "Credit Hours: $crehour4"
+         fi
+      done < "$_input5"
+      
+      if [ "$foundCourse2" = 1 ]
+      then
+         echo ""
+         echo -n "Are you sure to delete this course details? (y)es or (n)o: "; read sureDel2
+         while [[ ! "$sureDel2" = [YyNn] ]]
+         do
+            echo "Invalid input. Please enter again."
+            echo ""
+            echo -n "Are you sure to delete this course details? (y)es or (n)o: "; read sureDel2
+         done
+            
+         if [[ "$sureDel2" = [Yy] ]]
+         then
+            sed -i "/$codeDel/d" course.txt
+            echo "The data has been deleted permanently."
+         fi
+      elif [ "$foundCourse2" = 0 ]
+      then
+         echo "Course code does not exist."
+      fi
+   else
+      echo ""
+      echo "There is no course detail in the database."
+      sleep 2
+      clear
+      source /home/jaysim/mainMenu
+   fi
+   
+   echo ""
+   echo "*Press (q) to return to College Management Menu"
+   echo ""
+   echo -n "Delete Another Course? (y)es or (q)uit: "; read delC
+   
+   while [[ ! "$delC" = [YyQq] ]]
+   do
+      echo "Invalid input. Please enter again."
+      echo ""
+      echo -n "Delete Another Course? (y)es or (q)uit: "; read delC
+   done
+
+   if [[ "$delC" = [Qq] ]]
+   then
+      clear
+      source /home/jaysim/mainMenu
+   fi
+done

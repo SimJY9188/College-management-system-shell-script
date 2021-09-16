@@ -1,0 +1,73 @@
+#!/bin/bash
+
+clear
+
+COLUMNS=$(tput cols)
+title="Student Validation Form"
+underline="====================================================="
+_input="student.txt"
+if [ -f student.txt ] && [ -f course.txt ]
+then
+foundStud=0
+choice=""
+while [[ $foundStud = 0 ]]
+do
+	printf "\n%*s\n" $(((${#title}+$COLUMNS)/2)) "$title"
+	printf "%*s\n" $(((${#underline}+$COLUMNS)/2)) "$underline"
+	echo " "
+	echo " "
+	echo -n "Please enter the student's ID Number : "; read studId
+	if [ -z $studId ]
+	then
+		studId="Empty"
+	fi
+	   while IFS=":" read -r code id name bdate pnum hadd eadd
+	      do 
+		 if [ "$studId" = "$id" ]
+		 then
+		    foundStud=1
+		    echo " "
+		    echo "Student Name : $name "
+		    echo " "
+		    echo "Programme : $code"
+		    echo " "
+		    break;
+		 fi
+	    done < "$_input"
+	    if [ $foundStud = 0 ]
+	    then
+	    	echo "Invalid student ID. Please retry."
+	    fi
+	done        
+	  
+	while [[ "$choice" != [nNqQ] ]]
+		do
+		    
+		echo -n "Press (n) to continue to enter the student's marks or (q) to quit from the prompt : "; read choice
+		     
+		if [[ "$choice" = [nN] ]]
+		then  
+			sleep 1
+			./studentEMF $studId "$name"
+		elif [[ "$choice" = [qQ] ]]
+		then 
+			clear
+			source /home/jaysim/mainMenu
+		else 
+			echo "Invalid selection. Please retry."  
+			echo ""
+		fi
+	done
+else
+	echo ""
+	echo "There is no student detail / course details in the database."
+	sleep 2
+	clear
+	source /home/jaysim/mainMenu
+fi
+            
+                
+            
+            
+        
+

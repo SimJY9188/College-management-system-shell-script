@@ -1,0 +1,65 @@
+
+#!/bin/bash
+##completed
+
+clear
+
+_input3="course.txt"
+searchC=Y
+
+while [[ "$searchC" = [Yy] ]]
+do
+   foundCourse=0
+   if [ -f course.txt ]
+   then
+      echo ""
+      echo "               Search Course Details Form"
+      echo "               =========================="
+      echo ""
+      echo -n "Enter Course Code: "; read searchCode
+
+      while IFS=":" read -r codecourse3 cname3 crehour3
+      do
+         if [ "$codecourse3" = "$searchCode" ]
+         then
+            echo ""
+            echo "--------------------------------------------------------"
+            echo ""
+            echo "Result - "
+            echo ""
+            echo "Course Name : $cname3"
+            echo "Credit Hours: $crehour3"
+            foundCourse=1
+         fi
+      done < "$_input3"
+
+      if [ "$foundCourse" = 0 ]
+      then
+         echo "Cource code does not exist."
+      fi
+   else
+      echo ""
+      echo "There is no course detail in the database."
+      sleep 2
+      clear
+      source /home/jaysim/mainMenu
+   fi
+
+   echo ""
+   echo "*Press (q) to return to College Management Menu"
+   echo ""
+   echo -n "Search Another Course? (y)es or (q)uit: "; read searchC
+   
+   while [[ ! "$searchC" = [YyQq] ]]
+   do
+      echo "Invalid input. Please enter again."
+      echo ""
+      echo -n "Search Another Course? (y)es or (q)uit: "; read searchC
+   done
+
+   if [[ "$searchC" = [Qq] ]]
+   then
+      clear
+      source /home/jaysim/mainMenu
+   fi
+done

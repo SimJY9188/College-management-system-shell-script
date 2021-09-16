@@ -1,0 +1,79 @@
+
+#!/bin/bash
+
+clear
+
+_input5="student.txt"
+delS=Y
+
+while [[ "$delS" = [Yy] ]]
+do
+   foundStud2=0
+   if [ -f student.txt ]
+   then
+      echo ""
+      echo "               Delete Student Details Form"
+      echo "               ==========================="
+      echo ""
+      echo -n "Enter Student ID: "; read delStudID
+      
+      while IFS=":" read -r code5 id5 name5 bdate5 pnum5 hadd5 eadd5
+      do
+         if [ "$delStudID" = "$id5" ]
+         then
+            foundStud2=1
+            idDel=$id5
+            echo ""
+            echo "Student Name   : $name5"
+            echo "Contact Number : $pnum5"
+            echo "Mailing Address: $hadd5"
+            echo "Email Address  : $eadd5"
+         fi
+      done < "$_input5"
+      
+      if [ "$foundStud2" = 1 ]
+      then
+         echo ""
+         echo -n "Are you sure to delete this student details? (y)es or (n)o: "; read sureDel
+         while [[ ! "$sureDel" = [YyNn] ]]
+         do
+            echo "Invalid input. Please enter again."
+            echo ""
+            echo -n "Are you sure to delete this student details? (y)es or (n)o: "; read sureDel
+         done
+            
+         if [[ "$sureDel" = [Yy] ]]
+         then
+            sed -i "/$idDel/d" student.txt
+            echo "The data has been deleted permanently."
+         fi
+      elif [ "$foundStud2" = 0 ]
+      then
+         echo "Student ID does not exist."
+      fi
+   else
+      echo ""
+      echo "There is no student detail in the database."
+      sleep 2
+      clear
+      source /home/jaysim/mainMenu
+   fi
+   
+   echo ""
+   echo "*Press (q) to return to College Management Menu"
+   echo ""
+   echo -n "Delete Another Student? (y)es or (q)uit: "; read delS
+   
+   while [[ ! "$delS" = [YyQq] ]]
+   do
+      echo "Invalid input. Please enter again."
+      echo ""
+      echo -n "Delete Another Student? (y)es or (q)uit: "; read delS
+   done
+
+   if [[ "$delS" = [Qq] ]]
+   then
+      clear
+      source /home/jaysim/mainMenu
+   fi
+done

@@ -1,0 +1,66 @@
+
+#!/bin/bash
+
+clear
+
+_input="student.txt"
+searchS=Y
+
+while [[ "$searchS" = [Yy] ]]
+do
+   foundStud=0
+   if [ -f student.txt ]
+   then
+      echo ""
+      echo "               Search Student Details Form"
+      echo "               ==========================="
+      echo ""
+      echo -n "Enter student ID: "; read searchID
+
+      while IFS=":" read -r code4 id4 name4 bdate4 pnum4 hadd4 eadd4
+      do
+         if [ "$id4" = "$searchID" ]
+         then
+            echo ""
+            echo "---------------------------------------------------------"
+            echo ""
+            echo "Result - "
+            echo ""
+            echo "Student Name   : $name4"
+            echo "Contact Number : $pnum4"
+            echo "Mailing Address: $hadd4"
+            echo "Email Address  : $eadd4"
+            foundStud=1
+         fi
+      done < "$_input"
+   
+      if [ "$foundStud" = 0 ]
+      then
+         echo "Student ID does not exist."
+      fi
+   else
+      echo ""
+      echo "There is no student detail in the database."
+      sleep 2
+      clear
+      source /home/jaysim/mainMenu
+   fi
+
+   echo ""
+   echo "*Press (q) to return to College Management Menu"
+   echo ""
+   echo -n "Search Another Student? (y)es or (q)uit: "; read searchS
+
+   while [[ ! "$searchS" = [YyQq] ]]
+   do
+      echo "Invalid input. Please try again."
+      echo ""
+      echo -n "Search Another Student? (y)es or (q)uit: "; read searchS
+   done
+
+   if [[ "$searchS" = [Qq] ]]
+   then
+      clear
+      source /home/jaysim/mainMenu
+   fi
+done

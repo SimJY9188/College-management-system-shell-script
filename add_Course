@@ -1,0 +1,117 @@
+
+#!/bin/bash
+##completed
+
+clear
+
+_input2="course.txt"
+addcourse=Y
+
+while [[ "$addcourse" = [Yy] ]]
+do
+   echo ""
+   echo "               Add New Course Form"
+   echo "               ==================="
+   echo ""
+   
+   courseError=1
+   while [ "$courseError" = 1 ]
+   do
+      courseError=0
+      echo -n "Course Code         : "; read courseCode
+      ##check format & whether the input is null
+      if [[ ! "$courseCode" = [A-Z][A-Z][A-Z][A-Z][0-9][0-9][0-9][0-9] ]]
+      then
+         courseError=1
+         echo "The course code format is incorrect. Please enter again."
+         echo ""
+      ##check exist course code
+      elif [ -f course.txt ]
+      then
+         while IFS=":" read -r codecourse cname crehour
+         do
+            if [ "$courseCode" = "$codecourse" ]
+            then
+               courseError=1
+               echo "The course code already exist. Please enter again."
+               echo ""
+            fi
+         done < "$_input2"
+      fi
+   done
+
+   courseNameError=1
+   while [ "$courseNameError" = 1 ]
+   do
+      courseNameError=0
+      echo -n "Course Name         : "; read courseName
+      ##check whether it contain number
+      if [[ "$courseName" =~ [0-9] ]]
+      then
+         courseNameError=1
+         echo "The course name cannot contain number(s). Please enter again."
+         echo ""
+      ##check whether the input is null
+      elif [ -z "$courseName" ]
+      then
+         courseNameError=1
+         echo "This section cannot be empty. Please enter again."
+         echo ""
+      ##check exist course name
+      elif [ -f course.txt ]
+      then
+         while IFS=":" read -r codecourse2 cname2 crehour2
+         do
+            if [ "$courseName" = "$cname2" ]
+            then
+               courseNameError=1
+               echo "The course name already exist. Please enter again."
+               echo ""
+            fi
+         done < "$_input2"
+      fi
+   done
+   
+   creditError=1
+   while [ "$creditError" = 1 ]
+   do
+      creditError=0
+      echo -n "Credit Hours (1-12) : "; read creditHour
+      ##check if the input is all integer
+      if [[ "$creditHour" =~ ^[+-]?[0-9]+$ ]]
+      then
+         ##check the input is between 1 and 12
+         if [ "$creditHour" -lt 1 -o "$creditHour" -gt 12 ]
+         then         
+            creditError=1
+         fi
+      else
+         creditError=1
+      fi
+      if [ "$creditError" = 1 ]
+      then
+         echo "Invalid input. Please enter again."
+         echo ""
+      fi
+   done
+   
+   echo "$courseCode:$courseName:$creditHour" >> course.txt
+
+   echo ""
+   echo "*Press (q) to return to College Management Menu"
+   echo ""
+   echo -n "Add Another Course? (y)es or (q)uit: "; read addcourse
+   
+   while [[ ! "$addcourse" = [YyQq] ]]
+   do
+      echo "Invalid input. Please enter again."
+      echo ""
+      echo -n "Add Another Course? (y)es or (q)uit: "; read addcourse
+   done
+
+   if [[ "$addcourse" = [Qq] ]]
+   then
+      clear
+      source /home/jaysim/mainMenu
+   fi
+done

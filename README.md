@@ -1,4 +1,4 @@
-# Library-system-visual-basic
+# College-management-system-shell-script
 
 Assignment during Bachelor Degree Year 2 Semester 3 Study
 
